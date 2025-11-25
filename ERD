@@ -1,89 +1,167 @@
 @startuml
-' === Сущности бизнес-логики ===
+skinparam backgroundcolor #F8F9FA
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #333333
+skinparam classArrowColor #2E86AB
 
-class КЛИЕНТ {
-  + id: Integer
-  + имя: String
-  + телефон: String
-  + email: String
+' === Основные бизнес-сущности ===
+
+entity "Клиенты" as customers #FFE5D9 {
+  + customer_id: Integer <<PK>>
+  --
+  full_name: String
+  phone_number: String
+  email_address: String
+  registration_date: DateTime
 }
 
-class МАШИНА {
-  + id: Integer
-  + модель: String
-  + гос_номер: String
-  + клиент_id: Integer
+entity "Автомобили" as cars #FFD7BA {
+  + vehicle_id: Integer <<PK>>
+  --
+  model: String
+  license_plate: String
+  # owner_id: Integer <<FK>>
 }
 
-class МОЙКА {
-  + id: Integer
-  + название: String
-  + адрес: String
-  + город_id: Integer
-  + район_id: Integer
+entity "Автомойки" as car_washes #FFB4A2 {
+  + wash_id: Integer <<PK>>
+  --
+  name: String
+  address: String
+  contact_phone: String
+  # city_id: Integer <<FK>>
+  # district_id: Integer <<FK>>
 }
 
-class ЗАКАЗ {
-  + id: Integer
-  + дата_время: DateTime
-  + статус: String
-  + клиент_id: Integer
-  + машина_id: Integer
-  + мойка_id: Integer
-  + работник_id: Integer
-  + бокс_id: Integer
+entity "Заказы" as orders #E5989B {
+  + order_id: Integer <<PK>>
+  --
+  order_datetime: DateTime
+  status: String
+  total_amount: Decimal
+  # customer_id: Integer <<FK>>
+  # vehicle_id: Integer <<FK>>
+  # wash_id: Integer <<FK>>
+  # employee_id: Integer <<FK>>
+  # box_id: Integer <<FK>>
 }
 
-' === Справочники ===
+' === Справочники и классификаторы ===
 
-class ГОРОДА_СПРАВКА {
-  + id: Integer
-  + название: String
+entity "Города" as cities #B5EAD7 {
+  + city_id: Integer <<PK>>
+  --
+  city_name: String
+  region: String
 }
 
-class РАЙОНЫ_СПРАВКИ {
-  + id: Integer
-  + название: String
-  + город_id: Integer
+entity "Районы" as districts #C7CEEA {
+  + district_id: Integer <<PK>>
+  --
+  district_name: String
+  # city_id: Integer <<FK>>
 }
 
-' === Связанные с МОЙКОЙ сущности ===
+' === Операционные сущности ===
 
-class РАБОТНИКИ {
-  + id: Integer
-  + имя: String
-  + должность: String
-  + мойка_id: Integer
+entity "Сотрудники" as employees #FFDAC1 {
+  + employee_id: Integer <<PK>>
+  --
+  employee_name: String
+  position: String
+  hire_date: Date
+  # wash_id: Integer <<FK>>
 }
 
-class БОКСЫ {
-  + id: Integer
-  + номер: Integer
-  + мойка_id: Integer
+entity "Рабочие боксы" as boxes #E2F0CB {
+  + box_id: Integer <<PK>>
+  --
+  box_number: Integer
+  box_type: String
+  is_active: Boolean
+  # wash_id: Integer <<FK>>
 }
 
-class УСЛУГИ {
-  + id: Integer
-  + название: String
-  + цена: Decimal
-  + мойка_id: Integer
+entity "Услуги" as services #B5EAD7 {
+  + service_id: Integer <<PK>>
+  --
+  service_name: String
+  price: Decimal
+  duration_minutes: Integer
+  description: String
+  # wash_id: Integer <<FK>>
 }
 
-' === Ассоциации ===
+entity "Состав заказа" as order_items #C7CEEA {
+  + item_id: Integer <<PK>>
+  --
+  quantity: Integer
+  unit_price: Decimal
+  # order_id: Integer <<FK>>
+  # service_id: Integer <<FK>>
+}
 
-КЛИЕНТ "1" -- "0..*" МАШИНА : владеет
-МОЙКА "1" -- "0..*" РАБОТНИКИ : нанимает
-МОЙКА "1" -- "0..*" БОКСЫ : содержит
-МОЙКА "1" -- "0..*" УСЛУГИ : предлагает
+' === Основные отношения ===
 
-ГОРОДА_СПРАВКА "1" -- "0..*" РАЙОНЫ_СПРАВКИ : включает
+customers ||--o{ cars : "владеет"
+car_washes ||--o{ employees : "нанимает"
+car_washes ||--o{ boxes : "содержит"
+car_washes ||--o{ services : "предоставляет"
 
-ЗАКАЗ "1" --> "1" КЛИЕНТ : от клиента
-ЗАКАЗ "1" --> "1" МАШИНА : для машины
-ЗАКАЗ "1" --> "1" МОЙКА : в мойке
-ЗАКАЗ "1" --> "1" РАБОТНИКИ : выполняет работник
-ЗАКАЗ "1" --> "1" БОКСЫ : в боксе
+cities ||--o{ districts : "включает"
+districts ||--o{ car_washes : "расположены"
 
-МОЙКА --> ГОРОДА_СПРАВКА : в городе
-МОЙКА --> РАЙОНЫ_СПРАВКИ : в районе
+' === Отношения заказов ===
+
+orders }o--|| customers : "оформлен"
+orders }o--|| cars : "для автомобиля"
+orders }o--|| car_washes : "обслуживается"
+orders }o--|| employees : "выполняется"
+orders }o--|| boxes : "в боксе"
+
+' === Дополнительные отношения ===
+
+orders ||--o{ order_items : "содержит"
+services ||--o{ order_items : "включается"
+
+' === Отношения расположения ===
+
+car_washes }o--|| cities : "в городе"
+car_washes }o--|| districts : "в районе"
+
+' === Стили и заметки ===
+
+note top of customers #FFF9C4
+  <b>Клиенты</b>
+  Основная информация
+  о клиентах системы
+  с контактными данными
+end note
+
+note right of orders #E3F2FD
+  <b>Статусы заказов:</b>
+  • scheduled
+  • in_progress
+  • completed
+  • cancelled
+end note
+
+note left of services #E8F5E8
+  <b>Прайс-лист услуг</b>
+  с указанием длительности
+  выполнения и стоимости
+end note
+
+legend right
+  <b>Обозначения</b>
+  | PK - Первичный ключ |
+  | FK - Внешний ключ |
+  | ||--o{ : один-ко-многим |
+  | }o--|| : многие-к-одному |
+  <b>Цветовая схема:</b>
+  | Клиенты | Автомобили |
+  | Мойки | Заказы |
+  | Справочники | Персонал |
+end legend
+
 @enduml
