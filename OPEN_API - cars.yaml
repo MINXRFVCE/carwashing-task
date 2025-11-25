@@ -1,942 +1,196 @@
 openapi: 3.0.0
 info:
-  title: Car Wash & Service API
-  version: 1.0.0
-  description: API для управления сетью автомоек и сервисов, включая клиентов, машины, заказы, работников, боксы, услуги, города и районы.
+  title: Auto Care Management API
+  version: 2.0.0
+  description: API для управления сетью автомобильных моек и сервисных центров
 servers:
-  - url: http://localhost:3000
-    description: Локальный сервер
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
 tags:
-  # Основные бизнес-сущности
-  - name: customers
-    description: Управление клиентами
-  - name: cars
-    description: Управление автомобилями (владение клиентами)
-  - name: washes
-    description: Управление автомойками
-  - name: orders
-    description: Управление заказами (записями на обслуживание)
-  # Справочники
-  - name: reference
-    description: Справочники (города, районы)
-  # Связанные с мойками сущности
-  - name: employees
-    description: Управление работниками (работают в мойках)
-  - name: boxes
-    description: Управление боксами (находятся в мойках)
-  - name: services
-    description: Управление услугами (предлагаются мойками)
+  - name: Клиенты
+    description: Операции с клиентами и их транспортными средствами
+  - name: Объекты
+    description: Управление мойками и инфраструктурой
+  - name: Операции
+    description: Управление заказами и бронированиями
+  - name: Справочники
+    description: Базовая информация и классификаторы
 
 paths:
-  # --- КЛИЕНТЫ ---
-  /customers:
+  # === КЛИЕНТЫ И ТРАНСПОРТ ===
+  /клиенты:
     get:
-      tags:
-        - customers
-      summary: Получить список всех клиентов
+      tags: [Клиенты]
+      summary: Получение списка зарегистрированных клиентов
+      operationId: getCustomers
       responses:
         '200':
-          description: Список клиентов
+          description: Успешный ответ
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Customer'
+                  $ref: '#/components/schemas/Клиент'
+    
     post:
-      tags:
-        - customers
-      summary: Добавить нового клиента
+      tags: [Клиенты]
+      summary: Регистрация нового клиента
+      operationId: createCustomer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Customer'
+              $ref: '#/components/schemas/НовыйКлиент'
       responses:
         '201':
-          description: Клиент создан
+          description: Клиент успешно создан
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/Клиент'
 
-  /customers/{customerId}:
+  /клиенты/{clientId}:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    
     get:
-      tags:
-        - customers
-      summary: Получить клиента по ID
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Клиенты]
+      summary: Получение детальной информации о клиенте
+      operationId: getCustomerById
       responses:
         '200':
           description: Информация о клиенте
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/Клиент'
         '404':
           description: Клиент не найден
+    
     put:
-      tags:
-        - customers
-      summary: Заменить информацию о клиенте
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Клиенты]
+      summary: Полное обновление данных клиента
+      operationId: updateCustomer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Customer'
+              $ref: '#/components/schemas/ОбновлениеКлиента'
       responses:
         '200':
-          description: Клиент обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Customer'
-    patch:
-      tags:
-        - customers
-      summary: Частично обновить информацию о клиенте
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Customer'
-      responses:
-        '200':
-          description: Клиент обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Customer'
+          description: Данные клиента обновлены
+    
     delete:
-      tags:
-        - customers
-      summary: Удалить клиента по ID
-      parameters:
-        - name: customerId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Клиенты]
+      summary: Удаление клиента из системы
+      operationId: deleteCustomer
       responses:
         '204':
-          description: Клиент удалён
+          description: Клиент удален
 
-  # --- МАШИНЫ ---
-  /cars:
+  /транспортные-средства:
     get:
-      tags:
-        - cars
-      summary: Получить список всех автомобилей
+      tags: [Клиенты]
+      summary: Получение списка всех транспортных средств
+      operationId: getAllVehicles
       responses:
         '200':
-          description: Список автомобилей
+          description: Список транспортных средств
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Car'
+                  $ref: '#/components/schemas/ТранспортноеСредство'
+    
     post:
-      tags:
-        - cars
-        summary: Добавить новый автомобиль
+      tags: [Клиенты]
+      summary: Добавление нового транспортного средства
+      operationId: addVehicle
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Car'
+              $ref: '#/components/schemas/НовоеТранспортноеСредство'
       responses:
         '201':
-          description: Машина создана
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
+          description: Транспортное средство добавлено
 
-  /cars/{carId}:
+  # === АВТОМОЙКИ И ИНФРАСТРУКТУРА ===
+  /автомойки:
     get:
-      tags:
-        - cars
-      summary: Получить автомобиль по ID
-      parameters:
-        - name: carId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Объекты]
+      summary: Получение списка автомоек
+      operationId: getCarWashes
       responses:
         '200':
-          description: Информация об автомобиле
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-        '404':
-          description: Машина не найдена
-    put:
-      tags:
-        - cars
-      summary: Заменить информацию о машине
-      parameters:
-        - name: carId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Car'
-      responses:
-        '200':
-          description: Машина обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-    patch:
-      tags:
-        - cars
-      summary: Частично обновить информацию о машине
-      parameters:
-        - name: carId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Car'
-      responses:
-        '200':
-          description: Машина обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Car'
-    delete:
-      tags:
-        - cars
-      summary: Удалить машину по ID
-      parameters:
-        - name: carId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Машина удалена
-
-  # --- МОЙКИ ---
-  /washes:
-    get:
-      tags:
-        - washes
-      summary: Получить список всех автомоек
-      responses:
-        '200':
-          description: Список моек
+          description: Список автомоек
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Wash'
+                  $ref: '#/components/schemas/Автомойка'
+    
     post:
-      tags:
-        - washes
-      summary: Добавить новую автомойку
+      tags: [Объекты]
+      summary: Добавление новой автомойки
+      operationId: createCarWash
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Wash'
+              $ref: '#/components/schemas/НоваяАвтомойка'
       responses:
         '201':
-          description: Мойка создана
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Wash'
+          description: Автомойка создана
 
-  /washes/{washId}:
+  /персонал:
     get:
-      tags:
-        - washes
-      summary: Получить автомойку по ID
-      parameters:
-        - name: washId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Объекты]
+      summary: Получение списка сотрудников
+      operationId: getEmployees
       responses:
         '200':
-          description: Информация о мойке
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Wash'
-        '404':
-          description: Мойка не найдена
-    put:
-      tags:
-        - washes
-      summary: Заменить информацию о мойке
-      parameters:
-        - name: washId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Wash'
-      responses:
-        '200':
-          description: Мойка обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Wash'
-    patch:
-      tags:
-      - washes
-      summary: Частично обновить информацию о мойке
-      parameters:
-        - name: washId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Wash'
-      responses:
-        '200':
-          description: Мойка обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Wash'
-    delete:
-      tags:
-        - washes
-      summary: Удалить автомойку по ID
-      parameters:
-        - name: washId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Мойка удалена
-
-  # --- ЗАКАЗЫ ---
-  /orders:
-    get:
-      tags:
-        - orders
-      summary: Получить список всех заказов
-      responses:
-        '200':
-          description: Список заказов
+          description: Список сотрудников
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Order'
-    post:
-      tags:
-        - orders
-      summary: Создать новый заказ
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-      responses:
-        '201':
-          description: Заказ создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
+                  $ref: '#/components/schemas/Сотрудник'
 
-  /orders/{orderId}:
+  /рабочие-зоны:
     get:
-      tags:
-        - orders
-      summary: Получить заказ по ID
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Объекты]
+      summary: Получение списка рабочих зон
+      operationId: getWorkZones
       responses:
         '200':
-          description: Информация о заказе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '404':
-          description: Заказ не найден
-    put:
-      tags:
-        - orders
-      summary: Заменить информацию о заказе
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-      responses:
-        '200':
-          description: Заказ обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-    patch:
-      tags:
-        - orders
-      summary: Частично обновить информацию о заказе
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-      responses:
-        '200':
-          description: Заказ обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-    delete:
-      tags:
-        - orders
-      summary: Удалить заказ по ID
-      parameters:
-        - name: orderId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Заказ удалён
-
-  # --- СПРАВОЧНИКИ (ГОРОДА, РАЙОНЫ) ---
-  /reference/cities:
-    get:
-      tags:
-        - reference
-      summary: Получить список всех городов
-      responses:
-        '200':
-          description: Список городов
+          description: Список рабочих зон
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/City'
-    post:
-      tags:
-        - reference
-      summary: Добавить новый город
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-            $ref: '#/components/schemas/City'
-      responses:
-        '201':
-          description: Город добавлен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
+                  $ref: '#/components/schemas/РабочаяЗона'
 
-  /reference/cities/{cityId}:
+  /услуги:
     get:
-      tags:
-        - reference
-      summary: Получить город по ID
-      parameters:
-        - name: cityId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Информация о городе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-        '404':
-          description: Город не найден
-    put:
-      tags:
-        - reference
-      summary: Заменить информацию о городе
-      parameters:
-        - name: cityId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/City'
-      responses:
-        '200':
-          description: Город обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-    patch:
-      tags:
-        - reference
-      summary: Частично обновить информацию о городе
-      parameters:
-        - name: cityId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/City'
-      responses:
-        '200':
-          description: Город обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-    delete:
-      tags:
-        - reference
-      summary: Удалить город по ID
-      parameters:
-        - name: cityId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Город удалён
-
-  /reference/districts:
-    get:
-      tags:
-        - reference
-      summary: Получить список всех районов
-      responses:
-        '200':
-          description: Список районов
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/District'
-    post:
-      tags:
-        - reference
-      summary: Добавить новый район
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/District'
-      responses:
-        '201':
-          description: Район добавлен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/District'
-
-  /reference/districts/{districtId}:
-    get:
-      tags:
-        - reference
-      summary: Получить район по ID
-      parameters:
-        - name: districtId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Информация о районе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/District'
-        '404':
-          description: Район не найден
-    put:
-      tags:
-        - reference
-      summary: Заменить информацию о районе
-      parameters:
-        - name: districtId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/District'
-      responses:
-        '200':
-          description: Район обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/District'
-    patch:
-      tags:
-        - reference
-      summary: Частично обновить информацию о районе
-      parameters:
-        - name: districtId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/District'
-      responses:
-        '200':
-          description: Район обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/District'
-    delete:
-      tags:
-        - reference
-      summary: Удалить район по ID
-      parameters:
-        - name: districtId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Район удалён
-
-  # --- РАБОТНИКИ ---
-  /employees:
-    get:
-      tags:
-        - employees
-      summary: Получить список всех работников
-      responses:
-        '200':
-          description: Список работников
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Employee'
-    post:
-      tags:
-        - employees
-      summary: Добавить нового работника
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Employee'
-      responses:
-        '201':
-          description: Работник создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
-
-  /employees/{employeeId}:
-    get:
-      tags:
-        - employees
-      summary: Получить работника по ID
-      parameters:
-        - name: employeeId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Информация о работнике
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
-        '404':
-          description: Работник не найден
-    put:
-      tags:
-        - employees
-      summary: Заменить информацию о работнике
-      parameters:
-        - name: employeeId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Employee'
-      responses:
-        '200':
-          description: Работник обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
-    patch:
-      tags:
-        - employees
-      summary: Частично обновить информацию о работнике
-      parameters:
-        - name: employeeId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Employee'
-      responses:
-        '200':
-          description: Работник обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Employee'
-    delete:
-      tags:
-        - employees
-      summary: Удалить работника по ID
-      parameters:
-        - name: employeeId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Работник удалён
-
-  # --- БОКСЫ ---
-  /boxes:
-    get:
-      tags:
-        - boxes
-      summary: Получить список всех боксов
-      responses:
-        '200':
-          description: Список боксов
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Box'
-    post:
-      tags:
-        - boxes
-      summary: Добавить новый бокс
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-            $ref: '#/components/schemas/Box'
-      responses:
-        '201':
-          description: Бокс создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Box'
-
-  /boxes/{boxId}:
-    get:
-      tags:
-        - boxes
-      summary: Получить бокс по ID
-      parameters:
-        - name: boxId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Информация о боксе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Box'
-        '404':
-          description: Бокс не найден
-    put:
-      tags:
-        - boxes
-      summary: Заменить информацию о боксе
-      parameters:
-        - name: boxId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Box'
-      responses:
-        '200':
-          description: Бокс обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Box'
-    patch:
-      tags:
-        - boxes
-      summary: Частично обновить информацию о боксе
-      parameters:
-        - name: boxId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Box'
-      responses:
-        '200':
-          description: Бокс обновлён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Box'
-    delete:
-      tags:
-        - boxes
-      summary: Удалить бокс по ID
-      parameters:
-        - name: boxId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Бокс удалён
-
-  # --- УСЛУГИ ---
-  /services:
-    get:
-      tags:
-        - services
-      summary: Получить список всех услуг
+      tags: [Объекты]
+      summary: Получение списка доступных услуг
+      operationId: getServices
       responses:
         '200':
           description: Список услуг
@@ -945,342 +199,300 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Service'
+                  $ref: '#/components/schemas/Услуга'
+
+  # === ЗАКАЗЫ И БРОНИРОВАНИЯ ===
+  /бронирования:
+    get:
+      tags: [Операции]
+      summary: Получение списка бронирований
+      operationId: getBookings
+      responses:
+        '200':
+          description: Список бронирований
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Бронирование'
+    
     post:
-      tags:
-        - services
-      summary: Добавить новую услугу
+      tags: [Операции]
+      summary: Создание нового бронирования
+      operationId: createBooking
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Service'
+              $ref: '#/components/schemas/НовоеБронирование'
       responses:
         '201':
-          description: Услуга создана
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Service'
+          description: Бронирование создано
 
-  /services/{serviceId}:
+  # === СПРАВОЧНИКИ ===
+  /справочники/города:
     get:
-      tags:
-        - services
-      summary: Получить услугу по ID
-      parameters:
-        - name: serviceId
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Справочники]
+      summary: Получение списка городов
+      operationId: getCities
       responses:
         '200':
-          description: Информация об услуге
+          description: Список городов
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Service'
-        '404':
-          description: Услуга не найдена
-    put:
-      tags:
-        - services
-      summary: Заменить информацию об услуге
-      parameters:
-        - name: serviceId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Service'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Город'
+
+  /справочники/районы:
+    get:
+      tags: [Справочники]
+      summary: Получение списка районов
+      operationId: getDistricts
       responses:
         '200':
-          description: Услуга обновлена
+          description: Список районов
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Service'
-    patch:
-      tags:
-        - services
-      summary: Частично обновить информацию об услуге
-      parameters:
-        - name: serviceId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Service'
-      responses:
-        '200':
-          description: Услуга обновлена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Service'
-    delete:
-      tags:
-        - services
-      summary: Удалить услугу по ID
-      parameters:
-        - name: serviceId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '204':
-          description: Услуга удалена
+                type: array
+                items:
+                  $ref: '#/components/schemas/Район'
 
 components:
   schemas:
-    # Клиент (владеет машинами)
-    Customer:
+    # Основные сущности
+    Клиент:
       type: object
-      required:
-        - id
-        - имя
-        - телефон
+      required: [id, имя, телефон]
       properties:
         id:
           type: integer
-          example: 1
-          description: Уникальный идентификатор клиента
+          description: Уникальный идентификатор
         имя:
           type: string
-          example: "Иванов Иван Иванович"
-          description: Полное имя клиента
+          maxLength: 100
         телефон:
           type: string
-          example: "+79991234567"
-          description: Контактный телефон клиента
+          pattern: '^\+7\d{10}$'
         email:
           type: string
-          example: "ivanov@example.com"
-          description: Электронная почта клиента (опционально)
-
-    # Машина (принадлежит клиенту)
-    Car:
-      type: object
-      required:
-        - id
-        - модель
-        - гос_номер
-        - клиент_id
-      properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор машины
-        модель:
-          type: string
-          example: "Toyota Camry"
-          description: Модель автомобиля
-        гос_номер:
-          type: string
-          example: "A123BC77"
-          description: Государственный регистрационный номер
-        клиент_id:
-          type: integer
-          example: 1
-          description: ID клиента, владеющего машиной
-
-    # Автомойка (содержит боксы, нанимает работников, предлагает услуги)
-    Wash:
-      type: object
-      required:
-        - id
-        - название
-        - адрес
-        - город_id
-        - район_id
-      properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор мойки
-        название:
-          type: string
-          example: "Мойка у метро"
-          description: Название автомойки
-        адрес:
-          type: string
-          example: "ул. Ленина, д. 10"
-          description: Адрес автомойки
-        город_id:
-          type: integer
-          example: 1
-          description: ID города, где находится мойка
-        район_id:
-          type: integer
-          example: 1
-          description: ID района, где находится мойка
-
-    # Заказ (связывает клиента, машину, мойку, работника, бокс)
-    Order:
-      type: object
-      required:
-        - id
-        - дата_время
-        - статус
-        - клиент_id
-        - машина_id
-        - мойка_id
-        - работник_id
-      properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор заказа
-        дата_время:
+          format: email
+        датаРегистрации:
           type: string
           format: date-time
-          example: "2023-10-20T14:00:00Z"
-          description: Дата и время заказа
-        статус:
-          type: string
-          example: "scheduled"
-          description: Статус заказа (scheduled, in_progress, completed, cancelled)
-        клиент_id:
-          type: integer
-          example: 1
-          description: ID клиента, который сделал заказ
-        машина_id:
-          type: integer
-          example: 1
-          description: ID машины, для которой оформлен заказ
-        мойка_id:
-          type: integer
-          example: 1
-          description: ID мойки, где будет оказана услуга
-        работник_id:
-          type: integer
-          example: 1
-          description: ID работника, который будет выполнять заказ
-        бокс_id:
-          type: integer
-          example: 1
-          description: ID бокса, где будет оказана услуга (опционально)
 
-    # Город (справочник)
-    City:
+    НовыйКлиент:
       type: object
-      required:
-        - id
-        - название
+      required: [имя, телефон]
       properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор города
-        название:
-          type: string
-          example: "Москва"
-          description: Название города
-
-    # Район (справочник, принадлежит городу)
-    District:
-      type: object
-      required:
-        - id
-        - название
-        - город_id
-      properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор района
-        название:
-          type: string
-          example: "Центральный"
-          description: Название района
-        город_id:
-          type: integer
-          example: 1
-          description: ID города, которому принадлежит район
-
-    # Работник (работает в мойке)
-    Employee:
-      type: object
-      required:
-        - id
-        - имя
-        - должность
-        - мойка_id
-      properties:
-        id:
-          type: integer
-          example: 1
-          description: Уникальный идентификатор работника
         имя:
           type: string
-          example: "Петров Петр Петрович"
-          description: Полное имя работника
-        должность:
+          maxLength: 100
+        телефон:
           type: string
-          example: "Мойщик"
-          description: Должность работника
-        мойка_id:
-          type: integer
-          example: 1
-          description: ID мойки, где работает работник
+          pattern: '^\+7\d{10}$'
+        email:
+          type: string
+          format: email
 
-    # Бокс (находится в мойке)
-    Box:
+    ОбновлениеКлиента:
       type: object
-      required:
-        - id
-        - номер
-        - мойка_id
+      properties:
+        имя:
+          type: string
+          maxLength: 100
+        телефон:
+          type: string
+          pattern: '^\+7\d{10}$'
+        email:
+          type: string
+          format: email
+
+    ТранспортноеСредство:
+      type: object
+      required: [id, модель, регистрационныйНомер, владелецId]
       properties:
         id:
           type: integer
-          example: 1
-          description: Уникальный идентификатор бокса
-        номер:
+        модель:
+          type: string
+        регистрационныйНомер:
+          type: string
+        владелецId:
           type: integer
-          example: 1
-          description: Номер бокса
-        мойка_id:
-          type: integer
-          example: 1
-          description: ID мойки, где находится бокс
 
-    # Услуга (предлагается мойкой)
-    Service:
+    НовоеТранспортноеСредство:
       type: object
-      required:
-        - id
-        - название
-        - цена
-        - мойка_id
+      required: [модель, регистрационныйНомер, владелецId]
+      properties:
+        модель:
+          type: string
+        регистрационныйНомер:
+          type: string
+        владелецId:
+          type: integer
+
+    Автомойка:
+      type: object
+      required: [id, название, адрес, городId, районId]
       properties:
         id:
           type: integer
-          example: 1
-          description: Уникальный идентификатор услуги
         название:
           type: string
-          example: "Мойка кузова"
-          description: Название услуги
-        цена:
-          type: number
-          format: decimal
-          example: 500.00
-          description: Цена услуги
-        мойка_id:
+        адрес:
+          type: string
+        городId:
           type: integer
-          example: 1
-          description: ID мойки, которая предлагает услугу
+        районId:
+          type: integer
+        контакты:
+          type: string
+
+    НоваяАвтомойка:
+      type: object
+      required: [название, адрес, городId, районId]
+      properties:
+        название:
+          type: string
+        адрес:
+          type: string
+        городId:
+          type: integer
+        районId:
+          type: integer
+        контакты:
+          type: string
+
+    Сотрудник:
+      type: object
+      required: [id, имя, должность, мойкаId]
+      properties:
+        id:
+          type: integer
+        имя:
+          type: string
+        должность:
+          type: string
+        мойкаId:
+          type: integer
+
+    РабочаяЗона:
+      type: object
+      required: [id, номер, мойкаId]
+      properties:
+        id:
+          type: integer
+        номер:
+          type: integer
+        мойкаId:
+          type: integer
+        статус:
+          type: string
+          enum: [свободна, занята, нерабочая]
+
+    Услуга:
+      type: object
+      required: [id, название, стоимость, мойкаId]
+      properties:
+        id:
+          type: integer
+        название:
+          type: string
+        стоимость:
+          type: number
+          minimum: 0
+        мойкаId:
+          type: integer
+        длительность:
+          type: integer
+          description: Длительность в минутах
+
+    Бронирование:
+      type: object
+      required: [id, датаВремя, статус, клиентId, транспортноеСредствоId, мойкаId, сотрудникId]
+      properties:
+        id:
+          type: integer
+        датаВремя:
+          type: string
+          format: date-time
+        статус:
+          type: string
+          enum: [запланировано, в_процессе, завершено, отменено]
+        клиентId:
+          type: integer
+        транспортноеСредствоId:
+          type: integer
+        мойкаId:
+          type: integer
+        сотрудникId:
+          type: integer
+        рабочаяЗонаId:
+          type: integer
+        услуги:
+          type: array
+          items:
+            type: integer
+
+    НовоеБронирование:
+      type: object
+      required: [датаВремя, клиентId, транспортноеСредствоId, мойкаId, сотрудникId]
+      properties:
+        датаВремя:
+          type: string
+          format: date-time
+        клиентId:
+          type: integer
+        транспортноеСредствоId:
+          type: integer
+        мойкаId:
+          type: integer
+        сотрудникId:
+          type: integer
+        рабочаяЗонаId:
+          type: integer
+        услуги:
+          type: array
+          items:
+            type: integer
+
+    Город:
+      type: object
+      required: [id, название]
+      properties:
+        id:
+          type: integer
+        название:
+          type: string
+
+    Район:
+      type: object
+      required: [id, название, городId]
+      properties:
+        id:
+          type: integer
+        название:
+          type: string
+        городId:
+          type: integer
+
+  parameters:
+    ClientIdPath:
+      name: clientId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: Уникальный идентификатор клиента
+
+  responses:
+    NotFound:
+      description: Запрашиваемый ресурс не найден
+    ValidationError:
+      description: Ошибка валидации данных
