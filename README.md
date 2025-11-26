@@ -53,10 +53,7 @@
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/your-username/CarWashing-Task.git
-
-# Переход в директорию проекта
-cd CarWashing-Task
+git clone https://github.com/MINXRFVCE/carwashing-task
 
 # Просмотр документации
 open README.md
