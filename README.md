@@ -45,7 +45,7 @@
 
 | Архитектура системы | Процессы работы | Данные |
 |:-------------------:|:---------------:|:------:|
-| [![UseCase](./UseCase.png)](./UseCase_UML.md) | [![Sequence](./Sequence%20Diagram.png)](./Sequence%20Diagram.md) | [![ERD](./ERD%20Diagram.png)](./ERD.md) |
+| [![UseCase](./UseCase%20Diagram.png)](./UseCase_UML.md) | [![Sequence](./Sequence%20Diagram.png)](./Sequence%20Diagram.md) | [![ERD](./ERDdiagram.png)](./ERD.md) |
 
 </div>
 
