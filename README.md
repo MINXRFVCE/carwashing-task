@@ -43,8 +43,8 @@
 
 <div align="center">
 
-| Архитектура системы | Процессы работы | Данные |
-|:-------------------:|:---------------:|:------:|
+| Архитектура системы | Процессы работы | Данные | Пользовательский процесс |
+|:-------------------:|:---------------:|:------:| :-----------------------:|
 | [![UseCase](./UseCase%20Diagram.png)](./docs/UseCase_UML.md) | [![Sequence](./Sequence%20Diagram.png)](./docs/Sequence%20Diagram.md) | [![ERD](./ERDdiagram.png)](./docs/ERD.md) | ![UserStoryMapping](./UserStoryMapping.png) |
 
 </div>
