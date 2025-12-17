@@ -27,7 +27,7 @@
 | **III** | **ERD диаграмма** | Модель данных и отношения сущностей | [`ERD.md`](./docs/ERD.md) <br> ![ERD](./ERDdiagram.png) |
 | **IV** | **UseCase диаграмма** | Прецеденты использования системы | [`UseCase_UML.md`](./docs/UseCase_UML.md) <br> ![UseCase](./UseCase%20Diagram.png) |
 | **V** | **User Story** | Пользовательские сценарии | [`User_story.md`](./docs/User_story.md) |
-| **VI** | **User Story Mapping** | Карта пользовательских историй | [`UserStory Mapping.unidraw`](./docs/UserStory%20Mapping.unidraw) |
+| **VI** | **User Story Mapping** | Карта пользовательских историй | [`UserStory Mapping.unidraw`](./docs/UserStory%20Mapping.unidraw) <br> ![UserStoryMapping](./UserStoryMapping.png)|
 | **VII** | **Status Model** | Модель статусов заказов | [`Status Model.md`](./docs/Status%20Model.md) <br> ![Status Model](./Status%20model.png) |
 | **VIII** | **OpenAPI спецификация** | API документация | [`Open API Code - carswsh.yaml`](./docs/Open%20API%20Code%20-%20carswsh.yaml) |
 
@@ -45,7 +45,7 @@
 
 | Архитектура системы | Процессы работы | Данные |
 |:-------------------:|:---------------:|:------:|
-| [![UseCase](./UseCase%20Diagram.png)](./docs/UseCase_UML.md) | [![Sequence](./Sequence%20Diagram.png)](./docs/Sequence%20Diagram.md) | [![ERD](./ERDdiagram.png)](./docs/ERD.md) |
+| [![UseCase](./UseCase%20Diagram.png)](./docs/UseCase_UML.md) | [![Sequence](./Sequence%20Diagram.png)](./docs/Sequence%20Diagram.md) | [![ERD](./ERDdiagram.png)](./docs/ERD.md) | ![UserStoryMapping](./UserStoryMapping.png) |
 
 </div>
 
